@@ -2,460 +2,337 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Help Desk Ticket Analytics System — Project Charter</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Help Desk Ticket Analytics — BA Dashboard</title>
+  <style>
+  :root{
+    /* Light mode palette */
+    --bg:#f6f7fb;              /* app background */
+    --panel:#ffffff;            /* cards */
+    --panel-2:#f9fafb;         /* subtle panels */
+    --text:#0e1b2a;            /* primary text */
+    --muted:#5f6b7a;           /* secondary text */
+    --brand:#2563eb;           /* cool blue */
+    --brand-2:#1d4ed8;         /* darker blue */
+    --line:#e5e7eb;            /* borders */
+    --accent:#22c55e;          /* green */
+    --warn:#f59e0b;            /* amber */
+    --danger:#ef4444;          /* red */
+    --shadow: 0 8px 24px rgba(2,6,23,.08);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0; font-size:17px; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji"; background:var(--bg); color:var(--text);}
+
+  /* Layout */
+  .shell{display:grid; grid-template-columns: 280px 1fr; min-height:100vh}
+  .sidebar{background:linear-gradient(180deg, #0f172a 0%, #0b1220 100%); border-right:1px solid #0b1220; padding:16px; position:sticky; top:0; height:100vh;}
+  .logo{display:flex;align-items:center;gap:.6rem; font-weight:800; letter-spacing:.2px; color:#e5e7eb; padding:12px; border-radius:12px; background:rgba(37,99,235,.12);}
+  .logo svg{flex:none}
+
+  .nav{margin-top:14px; display:flex; flex-direction:column; gap:6px;}
+  .tab{display:flex; align-items:center; gap:.6rem; padding:10px 12px; border-radius:10px; color:#e5e7eb; text-decoration:none; border:1px solid transparent;}
+  .tab:hover{background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.1)}
+  .tab[aria-current="page"]{background:rgba(37,99,235,.22); border-color:rgba(37,99,235,.35); outline:2px solid rgba(37,99,235,.25)}
+  .tab svg{opacity:.95}
+
+  .main{background: radial-gradient(900px 600px at 10% -10%, rgba(37,99,235,.10), transparent 60%), radial-gradient(900px 600px at 120% 120%, rgba(34,197,94,.10), transparent 60%), linear-gradient(0deg, #fff0 0, #fff0 100%);} 
+  .content{max-width:1140px; margin:0 auto; padding:32px 32px 80px;}
+
+  .page-title{display:flex; align-items:center; justify-content:space-between; gap:16px; margin:8px 0 22px}
+  .page-title h1{font-size:26px; margin:0}
+  .subtitle{color:var(--muted); font-size:14px}
+
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:20px; box-shadow:var(--shadow)}
+  .grid{display:grid; gap:16px}
+  .grid.cols-2{grid-template-columns:repeat(2, minmax(0,1fr))}
+  .grid.cols-3{grid-template-columns:repeat(3, minmax(0,1fr))}
+  .grid.cols-4{grid-template-columns:repeat(4, minmax(0,1fr))}
+
+  .h3{margin:0 0 10px; font-size:19px}
+  .h4{margin:12px 0 6px; font-size:17px}
+  p{line-height:1.65}
+  a{color:var(--brand)}
+  hr{border:none; border-top:1px solid var(--line); margin:16px 0}
+  table{width:100%; border-collapse:collapse}
+  th,td{padding:12px 12px; border-top:1px solid var(--line); vertical-align:top}
+  thead th{border-top:none; text-align:left; color:#334155; font-weight:700; background:#f3f4f6}
+  .mono{font-variant-numeric:tabular-nums; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace}
+  .muted{color:var(--muted)}
+  .chip{display:inline-block; border:1px solid var(--line); padding:4px 10px; border-radius:999px; font-size:12px; color:#334155; background:#f8fafc}
+
+  .header-hero{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px;}
+  .hero-title{font-size:30px; margin:0}
+  .badge{background:rgba(34,197,94,.12); color:#0f5132; border-color:rgba(34,197,94,.25)}
+
+  @media (max-width: 960px){ .shell{grid-template-columns: 70px 1fr} .logo span{display:none} .tab span{display:none} }
+  @media (max-width: 640px){ .grid.cols-2, .grid.cols-3, .grid.cols-4{grid-template-columns:1fr} }
+
+  /* Section-specific */
+  .dod *{box-sizing:border-box}
+  .wbs *{box-sizing:border-box}
+  .budget *{box-sizing:border-box}
+  .kpi{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px}
+  .kpi .card{padding:14px}
+  .kpi .label{color:var(--muted); font-size:12px}
+  .kpi .value{font-weight:800; font-size:20px}
+</style>
 </head>
 <body>
+  <div class="shell">
+    <aside class="sidebar" role="navigation" aria-label="Primary">
+      <div class="logo" title="Help Desk Ticket Analytics">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16v4H4V6zm0 8h10v4H4v-4z" stroke="#9cc1ff" stroke-width="1.5"/>
+          <circle cx="18" cy="16" r="2.5" stroke="#9be9a8" stroke-width="1.5"/>
+        </svg>
+        <span>Help Desk Analytics</span>
+      </div>
 
-  <!-- Header -->
-  <header>
-    <h1>Help Desk Ticket Analytics System</h1>
-    <h2>Identifying &amp; Mitigating Recurring Issues</h2>
-  </header>
+      <nav class="nav" id="nav">
+        <a class="tab" href="#overview"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3l9 7v11H3V10l9-7z" stroke="#cbd7e1"/></svg><span>Overview</span></a>
+        <a class="tab" href="#vision"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 5v14M5 12h14" stroke="#cbd7e1"/></svg><span>Vision & Strategy</span></a>
+        <a class="tab" href="#scope"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 7h16M4 12h12M4 17h8" stroke="#cbd7e1"/></svg><span>Scope</span></a>
+        <a class="tab" href="#stakeholders"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 7a3 3 0 116 0 3 3 0 01-6 0zM4 20a5 5 0 0110 0" stroke="#cbd7e1"/></svg><span>Stakeholders</span></a>
+        <a class="tab" href="#methodology"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 6h6v12H4zM14 6h6v7h-6z" stroke="#cbd7e1"/></svg><span>Methodology</span></a>
+        <a class="tab" href="#dod"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 6h16M4 12h16M4 18h16" stroke="#cbd7e1"/></svg><span>Deliverables & DoD</span></a>
+        <a class="tab" href="#wbs"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 6h16M8 6v12M16 6v12M4 12h16" stroke="#cbd7e1"/></svg><span>WBS</span></a>
+        <a class="tab" href="#budget"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 18h14M5 6h14M8 6v12M16 6v12" stroke="#cbd7e1"/></svg><span>Budget</span></a>
+        <a class="tab" href="#tools"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3l3 6 6 3-6 3-3 6-3-6-6-3 6-3 3-6z" stroke="#cbd7e1"/></svg><span>Tools</span></a>
+      </nav>
+    </aside>
 
-  <!-- Student Info -->
-  <section>
-    <h3>Student Information</h3>
-    <ul>
-      <li><strong>Name:</strong> Giovanni Muñoz</li>
-      <li><strong>Course:</strong> Managing IT Projects</li>
-      <li><strong>Semester:</strong> Fall 2025</li>
-    </ul>
-  </section>
+    <section class="main" id="main">
+      <div class="content">
+        <div class="page-title"><h1>Loading…</h1></div>
+      </div>
+    </section>
+  </div>
 
-  <!-- 1. Project Title & Description -->
-  <section>
-    <h3>1. Project Title &amp; Description</h3>
-    <p><strong>Title:</strong> Help Desk Ticket Analytics System</p>
-    <p><strong>Description:</strong> The Help Desk Ticket Analytics System is a project designed to turn raw IT support ticket data into actionable insights. By analyzing and identifying the most frequent recurring issues, the system highlights opportunities to improve processes, reduce workload, and enhance overall support efficiency. This project demonstrates how data-driven decision making can transform everyday IT operations into more proactive and effective services.</p>
-  </section>
-
-  <!-- 2. Vision, Mission, and Strategy Alignment -->
-  <section>
-    <h3>2. Vision, Mission, and Strategy Alignment</h3>
-
-    <h4>Personal Mission Connection</h4>
-    <p>This project supports my personal mission of empowering people with technology by taking complex help desk ticket data and turning it into clear, actionable insights. Just as I strive to make technology more accessible for everyday users, this project demonstrates my ability to bridge technical analysis with practical solutions that improve IT support services.</p>
-
-    <h4>Vision Alignment</h4>
-    <p>My long-term vision is to work in a role where I combine technology with education and community impact. This project is a step toward that <em>future</em> by showcasing how data analytics can be used to improve processes, reduce barriers, and make technology a stronger asset for both individuals and organizations. By delivering a practical analytics system, I not only strengthen my technical portfolio but also build a model of how technology can be used to anticipate problems and support people more effectively.</p>
-
-    <h4>Strategy Goal Support</h4>
-    <p>This project advances my strategic goals in three ways:</p>
-    <ul>
-      <li><strong>Communication Skills:</strong> By presenting findings in clear visualizations and a professional case study, I will practice turning technical results into language that stakeholders can understand and act on.</li>
-      <li><strong>Data Analytics Development:</strong> The work directly builds my skills in analysis, visualization, and storytelling with data – skills that will later be reinforced through certifications in analytics and dashboarding.</li>
-      <li><strong>Leveraging Technical Strengths:</strong> This project channels my technical strengths into a structured, real-world project that aligns with my broader career roadmap. It demonstrates how I can transform raw data into valuable insights, which is a critical step toward roles in IT, data analysis, and beyond.</li>
-    </ul>
-  </section>
-
-  <!-- 3. Business Case & Justification -->
-  <section>
-    <h3>3. Business Case &amp; Justification</h3>
-
-    <h4>Professional Value</h4>
-    <p>This project strengthens my professional profile by giving me a tangible example of how I can apply data analytics to real IT problems. While many candidates may list technical skills on a resume, this project demonstrates those skills in action through a clear deliverable: identifying recurring IT issues and presenting solutions. It also adds depth to my portfolio, making me more competitive for roles in IT, data analysis, or technical support that require both analytical and problem-solving capabilities.</p>
-
-    <h4>Personal Value</h4>
-    <p>On a personal level, this project allows me to take ownership of my growth by transforming a challenge I’ve experienced firsthand at the Help Desk into a structured solution. The process will not only increase my confidence in tackling complex data problems but also give me the satisfaction of turning messy, overwhelming information into something organized and impactful. Beyond academics, it empowers me to imagine how analytics could one day improve operations at my workplace or even inspire the creation of a dedicated IT analytics function.</p>
-
-    <h4>Learning Outcomes</h4>
-    <p>Through this project, I expect to improve my ability to collect, clean, and analyze real-world data using tools that are relevant across industries. I will gain hands-on practice in turning data into visualizations and recommendations, a skill set that connects technical work to business decision-making. Additionally, the project provides a safe space to practice explaining insights clearly – building communication skills that will be essential for future presentations, team collaboration, and stakeholder engagement.</p>
-  </section>
-
-  <!-- 4. High-Level Scope -->
-  <section>
-    <h3>4. High-Level Scope</h3>
-
-    <h4>In Scope for Semester Project</h4>
-    <ul>
-      <li>Collect or simulate help desk ticket data (CSV, SQL, or dataset source).</li>
-      <li>Clean and prepare the data for analysis (Excel, SQL, or Python).</li>
-      <li>Develop an analytical model to identify the top 3–5 recurring IT issues.</li>
-      <li>Create visualizations (Excel, Power BI, or Python) to show patterns and trends.</li>
-      <li>Provide actionable recommendations to reduce recurring issues.</li>
-      <li>Document the system and publish results to a GitHub/portfolio site.</li>
-      <li>Deliver a professional presentation summarizing findings and recommendations.</li>
-    </ul>
-
-    <h4>Roadmap Items (Future Expansion)</h4>
-    <ul>
-      <li>Build an interactive dashboard in Power BI or Tableau for ongoing monitoring.</li>
-      <li>Explore predictive modeling (e.g., forecasting ticket volume or resolution time).</li>
-      <li>Automate parts of the workflow using Python scripts or APIs.</li>
-      <li>Integrate AI-based classification for categorizing ticket issues.</li>
-      <li>Apply the system to live ticket data at work for real-world validation.</li>
-    </ul>
-
-    <h4>Out of Scope</h4>
-    <ul>
-      <li>Deploying a production-grade ITSM or enterprise analytics platform.</li>
-      <li>Full automation or AI integration during this semester.</li>
-      <li>Making organizational changes at PCC or implementing solutions live.</li>
-      <li>Managing confidential or sensitive data from real systems without anonymization.</li>
-    </ul>
-  </section>
-
-  <!-- 5. Stakeholder Register -->
-  <section>
-    <h3>5. Stakeholder Register</h3>
-    <table border="1" cellpadding="6" cellspacing="0">
-      <thead>
-        <tr>
-          <th>Stakeholder</th>
-          <th>Category</th>
-          <th>Role/Interest</th>
-          <th>Power</th>
-          <th>Interest</th>
-          <th>Engagement Strategy</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Professor</td>
-          <td>Internal</td>
-          <td>Project sponsor &amp; evaluator; ensures academic success.</td>
-          <td>High</td>
-          <td>High</td>
-          <td>Submit quality deliverables on time; ask clarifying questions.</td>
-        </tr>
-        <tr>
-          <td>Classmates</td>
-          <td>Internal</td>
-          <td>Peer reviewers; provide feedback and collaboration opportunities.</td>
-          <td>Low</td>
-          <td>High</td>
-          <td>Share drafts; exchange reviews; practice presentations.</td>
-        </tr>
-        <tr>
-          <td>Future Employers</td>
-          <td>External</td>
-          <td>Evaluate portfolio/project as evidence of skills and problem-solving.</td>
-          <td>High</td>
-          <td>High</td>
-          <td>Tailor portfolio output (GitHub, website, case study) to highlight relevance.</td>
-        </tr>
-        <tr>
-          <td>Help Desk End Users</td>
-          <td>Internal</td>
-          <td>Staff/faculty/students whose issues generate tickets; impacted by recommendations.</td>
-          <td>Medium</td>
-          <td>High</td>
-          <td>Represent ticket categories in analysis; ensure recommendations support real needs.</td>
-        </tr>
-        <tr>
-          <td>Help Desk Supervisor/IT Managers</td>
-          <td>Internal</td>
-          <td>Oversee support operations; interested in efficiency and workload reduction.</td>
-          <td>High</td>
-          <td>Medium</td>
-          <td>Frame findings as actionable insights for process improvement.</td>
-        </tr>
-        <tr>
-          <td>Coworkers (Help Desk Team)</td>
-          <td>Internal</td>
-          <td>Front-line support; directly see recurring issues reflected in tickets.</td>
-          <td>Medium</td>
-          <td>Medium</td>
-          <td>Share insights informally; validate accuracy of top issue categories.</td>
-        </tr>
-        <tr>
-          <td>Mentors / Advisors</td>
-          <td>External</td>
-          <td>Provide career guidance; review technical and presentation quality.</td>
-          <td>Medium</td>
-          <td>High</td>
-          <td>Request targeted feedback on visuals, analysis, and storytelling.</td>
-        </tr>
-        <tr>
-          <td>Career Services</td>
-          <td>Internal</td>
-          <td>Support professional development; help polish portfolio delivery.</td>
-          <td>Medium</td>
-          <td>Medium</td>
-          <td>Use workshops/resume reviews to improve documentation and presentation.</td>
-        </tr>
-        <tr>
-          <td>Industry Associations</td>
-          <td>External</td>
-          <td>Promote analytics/IT standards; provide credibility and best practices.</td>
-          <td>Medium</td>
-          <td>Low</td>
-          <td>Reference best practices and frameworks in documentation.</td>
-        </tr>
-        <tr>
-          <td>Compliance / Data Privacy</td>
-          <td>Regulatory</td>
-          <td>Ensure project does not mishandle sensitive or confidential data.</td>
-          <td>High</td>
-          <td>Low</td>
-          <td>Use anonymized/simulated ticket data; document ethical considerations.</td>
-        </tr>
-        <tr>
-          <td>Toastmasters Group</td>
-          <td>External</td>
-          <td>Platform to practice presenting technical insights effectively.</td>
-          <td>Low</td>
-          <td>High</td>
-          <td>Present findings as speeches; gather communication feedback.</td>
-        </tr>
-        <tr>
-          <td>Friends/Peers</td>
-          <td>External</td>
-          <td>Provide encouragement and serve as practice audience for clarity.</td>
-          <td>Low</td>
-          <td>Medium</td>
-          <td>Share simplified findings; test storytelling flow.</td>
-        </tr>
-      </tbody>
-    </table>
-    <p><em>*Power Grid Visualization coming soon*</em></p>
-  </section>
-
-  <!-- 6. Project Methodology Selection -->
-  <section>
-    <h3>6. Project Methodology Selection</h3>
-    <p><strong>Chosen Methodology:</strong> Hybrid–Incremental</p>
-    <p><strong>Reasons:</strong></p>
-    <ul>
-      <li>Each deliverable is a distinct increment that builds toward the final system.</li>
-      <li>Allows flexibility in tools (Excel, Power BI, or Python/SQL) without breaking the plan.</li>
-      <li>Fits the semester timeline by spacing out work in logical stages.</li>
-      <li>Keeps the project structured and professional while avoiding the rigidity of pure Predictive.</li>
-    </ul>
-  </section>
-
-  <!-- 7. Deliverables & Definition of Done -->
-  <section>
-    <h3>7. Deliverables &amp; Definition of Done</h3>
-    <ul>
-      <li>Data Acquisition &amp; Preparation</li>
-      <li>Analytical Model of Recurring Issues</li>
-      <li>Visualizations &amp; Insights</li>
-      <li>Recommendations &amp; Mitigation Plan</li>
-      <li>System Documentation &amp; Portfolio Publication</li>
-      <li>Final Presentation</li>
-    </ul>
-    <p><em><strong>Note:</strong> Deliverable tasks and definition of done coming soon.</em></p>
-  </section>
-
-  <section id="dod-section" class="dod">
-  <style>
-    .dod * { box-sizing: border-box; }
-    .dod { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 1.5rem 0; }
-    .dod h2 { margin: 0 0 .75rem 0; font-size: 1.5rem; }
-    .dod .toolbar {
-      display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; margin: .75rem 0 1rem;
-    }
-    .dod .toolbar label { font-size: .85rem; color: #444; display: block; margin-bottom: .25rem; }
-    .dod select {
-      width: 220px; padding: .5rem .6rem; border: 1px solid #d0d5dd; border-radius: .5rem; outline: none;
-    }
-    .dod .table-wrap { border: 1px solid #e6e8eb; border-radius: .75rem; overflow: hidden; }
-    .dod table { width: 100%; border-collapse: collapse; font-size: .93rem; }
-    .dod thead th {
-      text-align: left; background: #f7f8fa; border-bottom: 1px solid #e6e8eb; padding: .6rem .75rem; font-weight: 600;
-    }
-    .dod tbody td { border-top: 1px solid #f0f2f4; padding: .6rem .75rem; vertical-align: top; }
-    .dod .mono { font-variant-numeric: tabular-nums; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-    .dod .chip {
-      display: inline-block; padding: .15rem .45rem; border-radius: .5rem; font-size: .75rem; line-height: 1; border: 1px solid;
-      background: #fff; color: #344054; border-color: #d0d5dd;
-    }
-    .dod .counter { font-size: .85rem; color: #667085; margin: .25rem 0 .75rem; }
-    .dod .no-results { padding: 1rem; text-align: center; color: #667085; }
-    .dod .col-smart, .dod .col-dod { width: 34%; }
-    .dod .col-type { width: 9rem; }
-    @media (max-width: 900px) {
-      .dod table, .dod thead, .dod tbody, .dod th, .dod td, .dod tr { display: block; }
-      .dod thead { display: none; }
-      .dod tbody tr { border-top: 1px solid #f0f2f4; padding: .6rem .75rem; }
-      .dod tbody td { border: none; padding: .25rem 0; }
-      .dod tbody td[data-label]::before {
-        content: attr(data-label) ": "; font-weight: 600; color: #475467;
-      }
-      .dod .table-wrap { border-radius: .75rem; }
-    }
-  </style>
-
-  <h2>Deliverables & Definition of Done</h2>
-
-  <div class="toolbar">
-    <div>
-      <label for="dod-type">Filter by Type</label>
-      <select id="dod-type">
-        <option value="">All types</option>
-      </select>
+  <!-- ================= TEMPLATES ================= -->
+  <template id="t-overview">
+    <div class="header-hero">
+      <h1 class="hero-title">Help Desk Ticket Analytics System</h1>
+      <span class="chip badge">Identifying & Mitigating Recurring Issues</span>
     </div>
-  </div>
+    <div class="grid cols-2">
+      <div class="card">
+        <div class="h3">Student Information</div>
+        <ul>
+          <li><strong>Name:</strong> Giovanni Muñoz</li>
+          <li><strong>Course:</strong> Managing IT Projects</li>
+          <li><strong>Semester:</strong> Fall 2025</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="h3">Project Title & Description</div>
+        <p><strong>Title:</strong> Help Desk Ticket Analytics System</p>
+        <p>The project turns raw IT support ticket data into actionable insights by identifying the most frequent recurring issues. The goal is to improve processes, reduce workload, and enhance support efficiency—demonstrating data-driven decision making in day-to-day IT operations.</p>
+      </div>
+    </div>
+  </template>
 
-  <div class="counter" id="dod-count"></div>
+  <template id="t-vision">
+    <div class="grid cols-2">
+      <div class="card">
+        <div class="h3">Personal Mission Connection</div>
+        <p>This project supports my personal mission of empowering people with technology by turning complex help desk data into clear, actionable insights that improve IT support services.</p>
+      </div>
+      <div class="card">
+        <div class="h3">Vision Alignment</div>
+        <p>Long-term, I aim to combine technology, education, and community impact. This project showcases how analytics can improve processes, reduce barriers, and build a model for anticipating problems to better support people.</p>
+      </div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <div class="h3">Strategy Goal Support</div>
+      <ul>
+        <li><strong>Communication Skills:</strong> Present findings through clear visualizations and case-study style narrative for stakeholders.</li>
+        <li><strong>Data Analytics Development:</strong> Build skills in analysis, visualization, and data storytelling to support certification goals.</li>
+        <li><strong>Leveraging Technical Strengths:</strong> Transform raw data into insights aligned with roles in IT and data analysis.</li>
+      </ul>
+    </div>
+  </template>
 
-  <div class="table-wrap">
-    <table aria-describedby="dod-count">
-      <thead>
-        <tr>
-          <th>Deliverable Name</th>
-          <th class="col-type">Type</th>
-          <th class="col-smart">SMART Description</th>
-          <th class="col-dod">Definition of Done</th>
-        </tr>
-      </thead>
-      <tbody id="dod-body"></tbody>
-    </table>
-    <div class="no-results" id="dod-none" hidden>No rows match your filter.</div>
-  </div>
+  <template id="t-scope">
+    <div class="grid cols-3">
+      <div class="card">
+        <div class="h3">In Scope (Semester)</div>
+        <ul>
+          <li>Collect/simulate ticket data (CSV/SQL).</li>
+          <li>Clean & prepare data (Excel/SQL/Python).</li>
+          <li>Identify top 3–5 recurring issues.</li>
+          <li>Create visualizations of trends and patterns.</li>
+          <li>Provide actionable recommendations.</li>
+          <li>Document system & publish results.</li>
+          <li>Deliver a professional presentation.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="h3">Roadmap (Future)</div>
+        <ul>
+          <li>Interactive dashboard (Power BI/Tableau).</li>
+          <li>Predictive modeling & forecasting.</li>
+          <li>Automate workflow via Python/APIs.</li>
+          <li>AI-based classification of tickets.</li>
+          <li>Apply to live data for validation.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="h3">Out of Scope</div>
+        <ul>
+          <li>Production-grade ITSM/enterprise analytics.</li>
+          <li>Full automation or AI integration this term.</li>
+          <li>Org changes or live implementations at PCC.</li>
+          <li>Handling sensitive data without anonymization.</li>
+        </ul>
+      </div>
+    </div>
+  </template>
 
-  <!-- Data as TSV for easy inline edits -->
-  <script id="dod-data" type="text/tsv">
-Deliverable Name	Type	SMART Description	Definition of Done
+  <template id="t-stakeholders">
+    <div class="card">
+      <div class="h3">Stakeholder Register</div>
+      <div class="muted" style="margin-bottom:8px">Power Grid visualization coming soon.</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Stakeholder</th><th>Category</th><th>Role/Interest</th><th>Power</th><th>Interest</th><th>Engagement Strategy</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Professor</td><td>Internal</td><td>Project sponsor & evaluator; ensures academic success.</td><td>High</td><td>High</td><td>Submit quality deliverables on time; ask clarifying questions.</td></tr>
+            <tr><td>Classmates</td><td>Internal</td><td>Peer reviewers; provide feedback and collaboration opportunities.</td><td>Low</td><td>High</td><td>Share drafts; exchange reviews; practice presentations.</td></tr>
+            <tr><td>Future Employers</td><td>External</td><td>Evaluate portfolio/project as evidence of skills and problem-solving.</td><td>High</td><td>High</td><td>Tailor portfolio output to highlight relevance.</td></tr>
+            <tr><td>Help Desk End Users</td><td>Internal</td><td>Staff/faculty/students whose issues generate tickets; impacted by recommendations.</td><td>Medium</td><td>High</td><td>Represent categories in analysis; support real needs.</td></tr>
+            <tr><td>Help Desk Supervisor/IT Managers</td><td>Internal</td><td>Oversee support operations; interested in efficiency/workload reduction.</td><td>High</td><td>Medium</td><td>Frame findings as actionable process improvements.</td></tr>
+            <tr><td>Coworkers (Help Desk Team)</td><td>Internal</td><td>Front-line support; see recurring issues reflected in tickets.</td><td>Medium</td><td>Medium</td><td>Share insights; validate accuracy of issue categories.</td></tr>
+            <tr><td>Mentors / Advisors</td><td>External</td><td>Provide career guidance; review technical and presentation quality.</td><td>Medium</td><td>High</td><td>Request targeted feedback on visuals and storytelling.</td></tr>
+            <tr><td>Career Services</td><td>Internal</td><td>Support professional development; help polish portfolio delivery.</td><td>Medium</td><td>Medium</td><td>Use workshops/resume reviews to improve docs and presentation.</td></tr>
+            <tr><td>Industry Associations</td><td>External</td><td>Promote analytics/IT standards; provide credibility and best practices.</td><td>Medium</td><td>Low</td><td>Reference best practices/frameworks in documentation.</td></tr>
+            <tr><td>Compliance / Data Privacy</td><td>Regulatory</td><td>Ensure project does not mishandle sensitive/confidential data.</td><td>High</td><td>Low</td><td>Use anonymized/simulated data; document ethics.</td></tr>
+            <tr><td>Toastmasters Group</td><td>External</td><td>Platform to practice presenting technical insights effectively.</td><td>Low</td><td>High</td><td>Present findings; gather communication feedback.</td></tr>
+            <tr><td>Friends/Peers</td><td>External</td><td>Provide encouragement; practice audience for clarity.</td><td>Low</td><td>Medium</td><td>Share simplified findings; test storytelling flow.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </template>
+
+  <template id="t-methodology">
+    <div class="card">
+      <div class="h3">Hybrid–Incremental Methodology</div>
+      <p>The project combines structured planning with iterative delivery. Each phase produces a usable output that builds toward the final Help Desk Ticket Analytics System.</p>
+      <div class="grid cols-4" style="margin-top:10px">
+        <div class="card" style="border-left:4px solid #2d5d3b">
+          <div class="h4">1️⃣ Initiation</div>
+          <div class="muted">Weeks 1–2</div>
+          <ul>
+            <li>Define mission, vision, and goal</li>
+            <li>Identify stakeholders</li>
+            <li>Draft project charter</li>
+          </ul>
+        </div>
+        <div class="card" style="border-left:4px solid #4caf50">
+          <div class="h4">2️⃣ Planning</div>
+          <div class="muted">Weeks 3–4</div>
+          <ul>
+            <li>Define scope and deliverables</li>
+            <li>Develop WBS & methodology</li>
+            <li>Select project tools</li>
+          </ul>
+        </div>
+        <div class="card" style="border-left:4px solid #ffb300">
+          <div class="h4">3️⃣ Execution – Increments</div>
+          <div class="muted">Weeks 5–12</div>
+          <ul>
+            <li>Increment 1: Data Preparation</li>
+            <li>Increment 2: Issue Analysis</li>
+            <li>Increment 3: Performance Insights</li>
+            <li>Increment 4: Recommendations</li>
+          </ul>
+        </div>
+        <div class="card" style="border-left:4px solid #2196f3">
+          <div class="h4">4️⃣ Closure</div>
+          <div class="muted">Weeks 13–15</div>
+          <ul>
+            <li>Finalize documentation</li>
+            <li>Deliver presentation</li>
+            <li>Reflect on outcomes</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <!-- Deliverables & DoD (interactive) -->
+  <template id="t-dod">
+    <div class="dod" id="dod-root">
+      <div class="page-title"><h1>Deliverables & Definition of Done</h1><span class="subtitle">Filter and review acceptance criteria</span></div>
+      <div class="card">
+        <div class="grid cols-3">
+          <div>
+            <label class="muted" for="dod-type">Filter by Type</label>
+            <select id="dod-type" style="width:100%; background:transparent; color:var(--text); border:1px solid var(--line); padding:8px 10px; border-radius:10px"></select>
+          </div>
+        </div>
+        <div class="muted" id="dod-count" style="margin:10px 0"></div>
+        <div class="table-wrap" style="border:1px solid var(--line); border-radius:12px; overflow:hidden">
+          <table aria-describedby="dod-count">
+            <thead>
+              <tr><th>Deliverable Name</th><th style="width:9rem">Type</th><th style="width:34%">SMART Description</th><th style="width:34%">Definition of Done</th></tr>
+            </thead>
+            <tbody id="dod-body"></tbody>
+          </table>
+          <div class="muted" id="dod-none" style="padding:16px; text-align:center; display:none">No rows match your filter.</div>
+        </div>
+      </div>
+      <script type="text/plain" id="dod-data">Deliverable Name	Type	SMART Description	Definition of Done
 Data Acquisition & Preparation	Tangible	Collect, clean, and organize Help Desk ticket data into a usable format within 6 days, ensuring completeness, accuracy, and consistency for analysis.	All datasets are collected, cleaned, and validated. A data dictionary and organized folder structure are completed, ensuring the dataset is analysis-ready and well-documented.
 Analytical Model of Recurring Issues	Intangible	Develop and validate an analytical model within 7 days to identify the top 3–5 recurring issues by frequency and resolution time.	Model successfully identifies recurring issues and produces reproducible results. Outputs are validated, documented, and interpreted clearly with supporting metrics.
 Visualizations & Insights	Tangible	Create 3–5 data visualizations summarizing recurring issues, resolution time, and satisfaction trends within 6 days.	Visualizations are finalized, clearly labeled, and embedded on the website. Each visual includes concise written insights that communicate trends effectively.
 Recommendations & Mitigation Plan	Intangible	Develop at least 3 actionable recommendations within 4 days, each rated for feasibility and assigned to a logical owner.	Recommendations are evidence-based, rated for feasibility (High/Medium/Low), assigned to responsible roles, and compiled in a summary table.
 System Documentation & Portfolio Publication	Tangible	Produce complete documentation (README, methodology notes, and case study page) and publish to the project website within 6 days.	All documentation is written, proofread, and published online. Case study page includes a clear narrative from problem to recommendations, and formatting meets professional standards.
 Final Presentation (Website)	Tangible	Develop and deliver a professional, web-based presentation showcasing the entire project (Problem → Data → Insights → Recommendations) within 7 days.	Website presentation is deployed, responsive, and peer-reviewed. Final rehearsal completed with positive feedback and readiness for Tuesday’s class presentation.
-  </script>
-
-  <script>
-    (function(){
-      const raw = document.getElementById('dod-data').textContent.trim().split(/\r?\n/);
-      const headers = raw.shift().split('\t');
-      const rows = raw.map(line => {
-        const cells = line.split('\t');
-        const obj = {};
-        headers.forEach((h,i)=> obj[h] = (cells[i] ?? '').trim());
-        return obj;
-      });
-
-      const body = document.getElementById('dod-body');
-      const none = document.getElementById('dod-none');
-      const count = document.getElementById('dod-count');
-      const typeSel = document.getElementById('dod-type');
-
-      // Populate type filter
-      const typeSet = [...new Set(rows.map(r => r['Type']).filter(Boolean))].sort();
-      typeSet.forEach(t=>{
-        const opt = document.createElement('option');
-        opt.value = t; opt.textContent = t;
-        typeSel.appendChild(opt);
-      });
-
-      const escapeHtml = s => s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-
-      function render() {
-        const typeFilter = typeSel.value;
-
-        const filtered = rows.filter(r=>{
-          if (typeFilter && r['Type'] !== typeFilter) return false;
-          return true;
-        });
-
-        body.innerHTML = '';
-        filtered.forEach(r=>{
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td data-label="Deliverable Name"><span class="mono">${escapeHtml(r['Deliverable Name'])}</span></td>
-            <td class="col-type" data-label="Type"><span class="chip">${escapeHtml(r['Type'])}</span></td>
-            <td class="col-smart" data-label="SMART Description">${escapeHtml(r['SMART Description'])}</td>
-            <td class="col-dod" data-label="Definition of Done">${escapeHtml(r['Definition of Done'])}</td>
-          `;
-          body.appendChild(tr);
-        });
-
-        const total = rows.length;
-        const shown = filtered.length;
-        none.hidden = shown !== 0;
-        count.textContent = `${shown} of ${total} deliverables shown`;
-      }
-
-      typeSel.addEventListener('change', render);
-      render();
-    })();
-  </script>
-</section>
-
-
-  <section id="wbs-section" class="wbs">
-  <style>
-    .wbs * { box-sizing: border-box; }
-    .wbs { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 1.5rem 0; }
-    .wbs h2 { margin: 0 0 .75rem 0; font-size: 1.5rem; }
-    .wbs .toolbar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      align-items: center;
-      margin: .75rem 0 1rem;
-    }
-    .wbs .toolbar label { font-size: .85rem; color: #444; display: block; margin-bottom: .25rem; }
-    .wbs select {
-      width: 200px; padding: .5rem .6rem; border: 1px solid #d0d5dd; border-radius: .5rem; outline: none;
-    }
-    .wbs .level-filters { display: flex; gap: .75rem; align-items: center; }
-    .wbs .level-filters label { display: inline-flex; gap: .35rem; align-items: center; font-size: .9rem; }
-    .wbs .table-wrap { border: 1px solid #e6e8eb; border-radius: .75rem; overflow: hidden; }
-    .wbs table { width: 100%; border-collapse: collapse; font-size: .93rem; }
-    .wbs thead th {
-      text-align: left; background: #f7f8fa; border-bottom: 1px solid #e6e8eb; padding: .6rem .75rem; font-weight: 600;
-    }
-    .wbs tbody td { border-top: 1px solid #f0f2f4; padding: .55rem .75rem; vertical-align: top; }
-    .wbs .mono { font-variant-numeric: tabular-nums; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-    .wbs .task-name { display: flex; gap: .5rem; align-items: center; }
-    .wbs .indent-0 { padding-left: 0; }
-    .wbs .indent-1 { padding-left: 1.25rem; }
-    .wbs .indent-2 { padding-left: 2.25rem; }
-    .wbs .chip {
-      display: inline-block; padding: .15rem .45rem; border-radius: .5rem; font-size: .75rem; line-height: 1; border: 1px solid;
-      background: #fff;
-    }
-    .wbs .chip.role { border-color: #d0d5dd; color: #344054; }
-    .wbs .chip.dep { border-color: #c7e7ff; color: #084b83; background: #eef7ff; }
-    .wbs .chip.par { border-color: #c6f7e2; color: #03543f; background: #eefcf6; }
-    .wbs .muted { color: #667085; }
-    .wbs .counter { font-size: .85rem; color: #667085; margin: .25rem 0 .75rem; }
-    .wbs .no-results { padding: 1rem; text-align: center; color: #667085; }
-  </style>
-
-  <h2>Work Breakdown Structure</h2>
-
-  <div class="toolbar">
-    <div>
-      <label for="wbs-role">Filter by Role</label>
-      <select id="wbs-role">
-        <option value="">All roles</option>
-      </select>
+      </script>
     </div>
-    <div class="level-filters" aria-label="Filter by Level">
-      <div><strong>Levels:</strong></div>
-      <label><input type="checkbox" class="wbs-level" value="Deliverable" checked> Deliverable</label>
-      <label><input type="checkbox" class="wbs-level" value="Work Package" checked> Work Package</label>
-      <label><input type="checkbox" class="wbs-level" value="Task" checked> Task</label>
-    </div>
-  </div>
+  </template>
 
-  <div class="counter" id="wbs-count"></div>
-
-  <div class="table-wrap">
-    <table aria-describedby="wbs-count">
-      <thead>
-        <tr>
-          <th style="width: 7rem;">WBS ID</th>
-          <th style="width: 9rem;">Level</th>
-          <th>Task / Work Package Name</th>
-          <th style="width: 7rem;">Duration<br><span class="muted">(days)</span></th>
-          <th>Dependencies</th>
-          <th style="width: 6rem;">Parallel?</th>
-          <th style="width: 6.5rem;">Role</th>
-        </tr>
-      </thead>
-      <tbody id="wbs-body"></tbody>
-    </table>
-    <div class="no-results" id="wbs-none" hidden>No rows match your filters.</div>
-  </div>
-
-  <script id="wbs-data" type="text/tsv">
-WBS ID	Level	Task/Work Package Name	Duration (Days)	Dependencies (WBS ID & Name)	Parallel?	Role
+  <!-- WBS (interactive) -->
+  <template id="t-wbs">
+    <div class="wbs" id="wbs-root">
+      <div class="page-title"><h1>Work Breakdown Structure</h1><span class="subtitle">Filter by role and level</span></div>
+      <div class="card">
+        <div class="grid cols-3">
+          <div>
+            <label class="muted" for="wbs-role">Filter by Role</label>
+            <select id="wbs-role" style="width:100%; background:transparent; color:var(--text); border:1px solid var(--line); padding:8px 10px; border-radius:10px"></select>
+          </div>
+          <div style="grid-column: span 2 / span 2; display:flex; gap:14px; align-items:flex-end; flex-wrap:wrap">
+            <div class="muted" style="margin-bottom:6px">Levels:</div>
+            <label><input type="checkbox" class="wbs-level" value="Deliverable" checked> Deliverable</label>
+            <label><input type="checkbox" class="wbs-level" value="Work Package" checked> Work Package</label>
+            <label><input type="checkbox" class="wbs-level" value="Task" checked> Task</label>
+          </div>
+        </div>
+        <div class="muted" id="wbs-count" style="margin:10px 0"></div>
+        <div class="table-wrap" style="border:1px solid var(--line); border-radius:12px; overflow:hidden">
+          <table aria-describedby="wbs-count">
+            <thead><tr>
+              <th style="width:7rem">WBS ID</th>
+              <th style="width:9rem">Level</th>
+              <th>Task / Work Package Name</th>
+              <th style="width:7rem">Duration <span class="muted">(days)</span></th>
+              <th>Dependencies</th>
+              <th style="width:6rem">Parallel?</th>
+              <th style="width:6.5rem">Role</th>
+            </tr></thead>
+            <tbody id="wbs-body"></tbody>
+          </table>
+          <div class="muted" id="wbs-none" style="padding:16px; text-align:center; display:none">No rows match your filters.</div>
+        </div>
+      </div>
+      <script type="text/plain" id="wbs-data">WBS ID	Level	Task/Work Package Name	Duration (Days)	Dependencies (WBS ID & Name)	Parallel?	Role
 1	Deliverable	Data Acquisition & Preparation	6	--	--	PM
 1.1	Work Package	Identify and Gather Data Sources	2	--	--	DA
 1.1.1	Task	Locate Help Desk ticket datasets	1	--	--	DA
@@ -507,186 +384,37 @@ WBS ID	Level	Task/Work Package Name	Duration (Days)	Dependencies (WBS ID & Name)
 6.2	Work Package	Presentation Rehearsal	3	6.1 – Website Design & Deployment	--	BA
 6.2.1	Task	Conduct peer review and practice run	2	--	--	BA
 6.2.2	Task	Implement feedback and finalize timing	1	6.2.1 – Peer review	--	PM
-  </script>
-
-  <script>
-    (function(){
-      const raw = document.getElementById('wbs-data').textContent.trim().split(/\r?\n/);
-      const headers = raw.shift().split('\t');
-      const rows = raw.map(line => {
-        const cells = line.split('\t');
-        const obj = {};
-        headers.forEach((h,i)=> obj[h] = (cells[i] ?? '').trim());
-        return obj;
-      });
-
-      const roleSel = document.getElementById('wbs-role');
-      const roleSet = [...new Set(rows.map(r => r['Role']).filter(Boolean))].sort();
-      roleSet.forEach(role=>{
-        const opt = document.createElement('option');
-        opt.value = role; opt.textContent = role;
-        roleSel.appendChild(opt);
-      });
-
-      const body = document.getElementById('wbs-body');
-      const none = document.getElementById('wbs-none');
-      const count = document.getElementById('wbs-count');
-      const levelChecks = Array.from(document.querySelectorAll('.wbs .wbs-level'));
-
-      function levelIndent(level) {
-        if (level === 'Deliverable') return 0;
-        if (level === 'Work Package') return 1;
-        return 2;
-      }
-      function parallelBadge(val) {
-        if (val === '||') return '<span class="chip par">Parallel</span>';
-        return '<span class="muted">—</span>';
-      }
-      function depBadge(dep) {
-        if (!dep || dep === '--') return '<span class="muted">—</span>';
-        return `<span class="chip dep">${dep}</span>`;
-      }
-
-      function render() {
-        const allowedLvls = new Set(levelChecks.filter(c=>c.checked).map(c=>c.value));
-        const roleFilter = roleSel.value;
-
-        const filtered = rows.filter(r=>{
-          if (!allowedLvls.has(r['Level'])) return false;
-          if (roleFilter && r['Role'] !== roleFilter) return false;
-          return true;
-        });
-
-        body.innerHTML = '';
-        filtered.forEach(r=>{
-          const indent = levelIndent(r['Level']);
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td class="mono">${r['WBS ID']}</td>
-            <td>${r['Level']}</td>
-            <td><div class="task-name indent-${indent}">${r['Task/Work Package Name']}</div></td>
-            <td class="mono">${r['Duration (Days)']}</td>
-            <td>${depBadge(r['Dependencies (WBS ID & Name)'])}</td>
-            <td>${parallelBadge(r['Parallel?'])}</td>
-            <td><span class="chip role">${r['Role']}</span></td>
-          `;
-          body.appendChild(tr);
-        });
-
-        const total = rows.length;
-        const shown = filtered.length;
-        none.hidden = shown !== 0;
-        count.textContent = `${shown} of ${total} items shown`;
-      }
-
-      roleSel.addEventListener('change', render);
-      levelChecks.forEach(cb=> cb.addEventListener('change', render));
-      render();
-    })();
-  </script>
-</section>
-
-<!-- Budget estimate section -->
-
-<section>
-
-  <section id="budget-section" class="budget">
-  <style>
-    .budget * { box-sizing: border-box; }
-    .budget { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 1.5rem 0; }
-    .budget h2 { margin: 0 0 .75rem 0; font-size: 1.5rem; }
-    .budget .toolbar {
-      display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; margin: .75rem 0 1rem;
-    }
-    .budget .toolbar label { font-size: .85rem; color: #444; display: block; margin-bottom: .25rem; }
-    .budget select {
-      width: 240px; padding: .5rem .6rem; border: 1px solid #d0d5dd; border-radius: .5rem; outline: none;
-    }
-
-    .budget .table-wrap { border: 1px solid #e6e8eb; border-radius: .75rem; overflow: hidden; }
-    .budget table { width: 100%; border-collapse: collapse; font-size: .93rem; }
-    .budget thead th {
-      text-align: left; background: #f7f8fa; border-bottom: 1px solid #e6e8eb; padding: .6rem .75rem; font-weight: 600;
-    }
-    .budget tbody td { border-top: 1px solid #f0f2f4; padding: .55rem .75rem; vertical-align: top; }
-    .budget tfoot td { background: #fafbfc; border-top: 1px solid #e6e8eb; padding: .65rem .75rem; font-weight: 600; }
-    .budget .mono { font-variant-numeric: tabular-nums; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-    .budget .muted { color: #667085; }
-
-    .budget .chip {
-      display: inline-block; padding: .15rem .45rem; border-radius: .5rem; font-size: .75rem; line-height: 1;
-      border: 1px solid #d0d5dd; color: #344054; background: #fff;
-    }
-
-    .budget .counter { font-size: .85rem; color: #667085; margin: .25rem 0 .75rem; }
-
-    .budget .summary {
-      display: grid; gap: .5rem; grid-template-columns: repeat(3, minmax(0,1fr));
-      margin-top: .75rem;
-    }
-    .budget .summary .card {
-      border: 1px solid #e6e8eb; border-radius: .75rem; padding: .75rem .9rem; background: #fff;
-    }
-    .budget .summary .label { font-size: .85rem; color: #475467; }
-    .budget .summary .value { font-size: 1.15rem; font-weight: 700; }
-
-    @media (max-width: 800px) {
-      .budget .summary { grid-template-columns: 1fr; }
-      .budget table, .budget thead, .budget tbody, .budget th, .budget td, .budget tr { display: block; }
-      .budget thead { display: none; }
-      .budget tbody tr { border-top: 1px solid #f0f2f4; padding: .6rem .75rem; }
-      .budget tbody td { border: none; padding: .25rem 0; }
-      .budget tbody td[data-label]::before { content: attr(data-label) ": "; font-weight: 600; color: #475467; }
-    }
-  </style>
-
-  <h2>Budget Estimate</h2>
-
-  <div class="toolbar">
-    <div>
-      <label for="budget-cat">Filter by Category</label>
-      <select id="budget-cat">
-        <option value="">All categories</option>
-      </select>
+      </script>
     </div>
-  </div>
+  </template>
 
-  <div class="counter" id="budget-count"></div>
-
-  <div class="table-wrap">
-    <table aria-describedby="budget-count">
-      <thead>
-        <tr>
-          <th>Cost Item</th>
-          <th style="width: 9rem;">Quantity/Hours</th>
-          <th style="width: 9rem;">Rate/Price</th>
-          <th style="width: 9rem;">Total Cost</th>
-          <th>Notes</th>
-          <th style="width: 9rem;">Category</th>
-        </tr>
-      </thead>
-      <tbody id="budget-body"></tbody>
-    </table>
-  </div>
-
-  <div class="summary" aria-live="polite">
-    <div class="card">
-      <div class="label">Subtotal (Direct Costs)</div>
-      <div class="value mono" id="sum-subtotal">$0.00</div>
-    </div>
-    <div class="card">
-      <div class="label">Contingency (20%)</div>
-      <div class="value mono" id="sum-contingency">$0.00</div>
-    </div>
-    <div class="card">
-      <div class="label">Total Project Budget</div>
-      <div class="value mono" id="sum-total">$0.00</div>
-    </div>
-  </div>
-
-  <!-- Data as TSV; section headers define categories -->
-  <script id="budget-data" type="text/tsv">
-Cost Item	Quantity/Hours	Rate/Price	Total Cost	Notes
+  <!-- Budget (interactive) -->
+  <template id="t-budget">
+    <div class="budget" id="budget-root">
+      <div class="page-title"><h1>Budget Estimations</h1><span class="subtitle">Filter by category</span></div>
+      <div class="card">
+        <div class="grid cols-3">
+          <div>
+            <label class="muted" for="budget-cat">Category</label>
+            <select id="budget-cat" style="width:100%; background:transparent; color:var(--text); border:1px solid var(--line); padding:8px 10px; border-radius:10px"></select>
+          </div>
+        </div>
+        <div class="muted" id="budget-count" style="margin:10px 0"></div>
+        <div class="table-wrap" style="border:1px solid var(--line); border-radius:12px; overflow:hidden">
+          <table aria-describedby="budget-count">
+            <thead>
+              <tr><th>Cost Item</th><th style="width:9rem">Quantity/Hours</th><th style="width:9rem">Rate/Price</th><th style="width:9rem">Total Cost</th><th>Notes</th><th style="width:9rem">Category</th></tr>
+            </thead>
+            <tbody id="budget-body"></tbody>
+          </table>
+        </div>
+        <div class="kpi" style="margin-top:12px">
+          <div class="card"><div class="label">Subtotal (Direct Costs)</div><div class="value mono" id="sum-subtotal">$0.00</div></div>
+          <div class="card"><div class="label">Contingency (20%)</div><div class="value mono" id="sum-contingency">$0.00</div></div>
+          <div class="card"><div class="label">Total Project Budget</div><div class="value mono" id="sum-total">$0.00</div></div>
+        </div>
+      </div>
+      <script type="text/plain" id="budget-data">Cost Item	Quantity/Hours	Rate/Price	Total Cost	Notes
 LABOR COSTS				
 Data Analyst (DA)	92	45	4140	Based on WBS: 23 days × 4 hrs/day
 Business Analyst (BA)	100	40	4000	Based on WBS: 25 days × 4 hrs/day
@@ -698,7 +426,8 @@ Microsoft Office (365 EDU License)	1	0	0	Provided free by college
 ChatGPT (Educational License)	1	0	0	Provided under student plan
 Claude AI	1	0	0	Provided free with student access
 Dataset Access (Internal Help Desk)	1	0	0	Provided through institutional access
-EQUIPMENT/SOFTWARE SUBTOTAL			0	
+Asana Starter (Project Management)	3 months	30	90	Used for timeline, dependencies, milestones, and dashboards
+EQUIPMENT/SOFTWARE SUBTOTAL			90	
 MATERIALS				
 Domain name for website	1	15	15	One-year domain registration
 Graphics and icons (stock media)	1	20	20	Visual assets for presentation site
@@ -711,138 +440,235 @@ SERVICES SUBTOTAL			50
 SUBTOTAL DIRECT COSTS			15075	Sum of all categories
 Contingency Reserve (20%)			3015	Covers review, revisions, and presentation prep
 TOTAL PROJECT BUDGET			18090	Final estimated cost
-  </script>
+      </script>
+    </div>
+  </template>
 
+  <template id="t-tools">
+    <div class="card">
+      <div class="h3">Project Tool Selection & Justification</div>
+      <p>
+        The selected project management tool is <strong>Asana Starter</strong>, aligning with the Hybrid–Incremental methodology. It supports structured planning with iterative delivery across increments from data preparation through final presentation.
+      </p>
+      <div class="h4">Key Features</div>
+      <ul>
+        <li><strong>Task Boards & Sections:</strong> Track increments and dependencies clearly.</li>
+        <li><strong>Dependencies & Milestones:</strong> Visual sequencing and review checkpoints.</li>
+        <li><strong>Timeline/Gantt:</strong> Overlap and transitions across increments.</li>
+        <li><strong>Dashboards & Reporting:</strong> Visibility into completion and workload.</li>
+        <li><strong>Custom Fields & Status:</strong> Priorities and status tracking.</li>
+      </ul>
+      <p><em>Outcome:</em> Professional workflow mirroring real IT environments with transparency and incremental value delivery.</p>
+    </div>
+  </template>
+
+  <!-- ================= APP SCRIPT ================= -->
   <script>
-    (function(){
-      const currency = new Intl.NumberFormat('en-US', { style:'currency', currency:'USD' });
-      const raw = document.getElementById('budget-data').textContent.trim().split(/\r?\n/);
-      const headers = raw.shift().split('\t');
+    const $ = (sel,root=document) => root.querySelector(sel);
+    const $$ = (sel,root=document) => Array.from(root.querySelectorAll(sel));
 
-      // Parse TSV & infer categories from header rows
+    // Mount helpers
+    function mountTemplate(id, container){
+      const tpl = document.getElementById(id);
+      if(!tpl){ container.innerHTML = `<div class="card">Template <code>${id}</code> not found.</div>`; return; }
+      container.innerHTML = '';
+      container.appendChild(tpl.content.cloneNode(true));
+    }
+
+    // -------- Deliverables & DoD module --------
+    function initDod(root){
+      const dataEl = $('#dod-data', root);
+      const typeSel = $('#dod-type', root);
+      const body = $('#dod-body', root);
+      const none = $('#dod-none', root);
+      const count = $('#dod-count', root);
+      if(!dataEl) return; // not present
+      const raw = dataEl.textContent.trim().split(/\r?\n/);
+      const headers = raw.shift().split('\t');
+      const rows = raw.map(line=>{ const c=line.split('\t'); const o={}; headers.forEach((h,i)=>o[h]= (c[i]||'').trim()); return o; });
+      const types = [...new Set(rows.map(r=>r['Type']).filter(Boolean))].sort();
+      typeSel.innerHTML = `<option value="">All types</option>` + types.map(t=>`<option>${esc(t)}</option>`).join('');
+
+      function render(){
+        const filter = typeSel.value;
+        const filtered = rows.filter(r=>!filter || r['Type']===filter);
+        body.innerHTML = filtered.map(r=>`
+          <tr>
+            <td><span class="mono">${esc(r['Deliverable Name'])}</span></td>
+            <td><span class="chip">${esc(r['Type'])}</span></td>
+            <td>${esc(r['SMART Description'])}</td>
+            <td>${esc(r['Definition of Done'])}</td>
+          </tr>
+        `).join('');
+        none.style.display = filtered.length? 'none':'block';
+        count.textContent = `${filtered.length} of ${rows.length} deliverables shown`;
+      }
+      typeSel.addEventListener('change', render);
+      render();
+    }
+
+    // -------- WBS module --------
+    function initWbs(root){
+      const dataEl = $('#wbs-data', root);
+      if(!dataEl) return;
+      const raw = dataEl.textContent.trim().split(/\r?\n/);
+      const headers = raw.shift().split('\t');
+      const rows = raw.map(line=>{ const c=line.split('\t'); const o={}; headers.forEach((h,i)=>o[h]= (c[i]||'').trim()); return o; });
+      const roleSel = $('#wbs-role', root);
+      const levelChecks = $$('.wbs-level', root);
+      const body = $('#wbs-body', root);
+      const none = $('#wbs-none', root);
+      const count = $('#wbs-count', root);
+
+      const roles = [...new Set(rows.map(r=>r['Role']).filter(Boolean))].sort();
+      roleSel.innerHTML = `<option value="">All roles</option>` + roles.map(r=>`<option>${esc(r)}</option>`).join('');
+
+      const levelIndent = lvl => lvl==='Deliverable'?0: (lvl==='Work Package'?1:2);
+      const depBadge = dep => (!dep || dep==='--')? '<span class="muted">—</span>' : `<span class="chip">${esc(dep)}</span>`;
+      const parBadge = v => (v==='||')? '<span class="chip">Parallel</span>' : '<span class="muted">—</span>';
+
+      function render(){
+        const allowedLvls = new Set(levelChecks.filter(c=>c.checked).map(c=>c.value));
+        const roleFilter = roleSel.value;
+        const filtered = rows.filter(r=> allowedLvls.has(r['Level']) && (!roleFilter || r['Role']===roleFilter));
+        body.innerHTML = filtered.map(r=>`
+          <tr>
+            <td class="mono">${esc(r['WBS ID'])}</td>
+            <td>${esc(r['Level'])}</td>
+            <td><div style="padding-left:${levelIndent(r['Level'])*18}px">${esc(r['Task/Work Package Name'])}</div></td>
+            <td class="mono">${esc(r['Duration (Days)'])}</td>
+            <td>${depBadge(r['Dependencies (WBS ID & Name)'])}</td>
+            <td>${parBadge(r['Parallel?'])}</td>
+            <td><span class="chip">${esc(r['Role'])}</span></td>
+          </tr>
+        `).join('');
+        none.style.display = filtered.length? 'none':'block';
+        count.textContent = `${filtered.length} of ${rows.length} items shown`;
+      }
+      roleSel.addEventListener('change', render);
+      levelChecks.forEach(cb=>cb.addEventListener('change', render));
+      render();
+    }
+
+    // -------- Budget module --------
+    function initBudget(root){
+      const dataEl = $('#budget-data', root);
+      if(!dataEl) return;
+      const raw = dataEl.textContent.trim().split(/\r?\n/);
+      const headers = raw.shift().split('\t');
       const rows = [];
       let currentCat = '';
       raw.forEach(line=>{
         const cells = line.split('\t');
-        // Category header rows are a single non-empty cell with the rest empty
-        const onlyFirstFilled = cells[0] && cells.slice(1).every(c => (c ?? '').trim() === '');
-        if (onlyFirstFilled) {
-          currentCat = cells[0].trim();
-          return;
-        }
-        const o = {};
-        headers.forEach((h,i)=> o[h] = (cells[i] ?? '').trim());
-        o.Category = currentCat;
-        rows.push(o);
+        const onlyFirst = cells[0] && cells.slice(1).every(c => (c||'').trim()==='');
+        if(onlyFirst){ currentCat = cells[0].trim(); return; }
+        const o={}; headers.forEach((h,i)=> o[h] = (cells[i]||'').trim());
+        o.Category = currentCat; rows.push(o);
       });
 
-      // Identify rows that are subtotals / totals (do not show in main body)
-      const isSummaryRow = (name) => {
-        if (!name) return false;
-        const n = name.toUpperCase();
-        return n.includes('SUBTOTAL') || n.includes('TOTAL PROJECT BUDGET') || n.startsWith('CONTINGENCY');
-      };
+      const catSel = $('#budget-cat', root);
+      const body = $('#budget-body', root);
+      const count = $('#budget-count', root);
+      const elSub = $('#sum-subtotal', root), elCont=$('#sum-contingency', root), elTotal=$('#sum-total', root);
 
-      // Build category filter (skip empty)
-      const catSel = document.getElementById('budget-cat');
-      const categories = [...new Set(rows.map(r => r.Category).filter(Boolean))];
-      categories.forEach(c=>{
-        const opt = document.createElement('option');
-        opt.value = c; opt.textContent = c;
-        catSel.appendChild(opt);
-      });
+      const cats = [...new Set(rows.map(r=>r.Category).filter(Boolean))];
+      catSel.innerHTML = `<option value="">All categories</option>` + cats.map(c=>`<option>${esc(c)}</option>`).join('');
 
-      const body = document.getElementById('budget-body');
-      const count = document.getElementById('budget-count');
-      const elSubtotal = document.getElementById('sum-subtotal');
-      const elCont = document.getElementById('sum-contingency');
-      const elTotal = document.getElementById('sum-total');
+      const isSummary = name => { if(!name) return false; const n = name.toUpperCase(); return n.includes('SUBTOTAL') || n.includes('TOTAL PROJECT BUDGET') || n.startsWith('CONTINGENCY'); };
+      const currency = n => new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n);
+      const num = x => { const n = parseFloat(String(x).replace(/,/g,'')); return isNaN(n)?0:n; };
 
-      function num(x){ const n = parseFloat(String(x).replace(/,/g,'')); return isNaN(n)?0:n; }
-
-      function compute() {
-        // Visible item rows (exclude summary rows)
+      function compute(){
         const cat = catSel.value;
-        const filtered = rows.filter(r=>{
-          if (isSummaryRow(r['Cost Item'])) return false;
-          if (cat && r.Category !== cat) return false;
-          return true;
-        });
-
-        // Render body
-        body.innerHTML = '';
-        filtered.forEach(r=>{
+        const filtered = rows.filter(r=> !isSummary(r['Cost Item']) && (!cat || r.Category===cat));
+        body.innerHTML = filtered.map(r=>{
           const qty = num(r['Quantity/Hours']);
           const rate = num(r['Rate/Price']);
-          // Prefer provided Total Cost when present; otherwise compute
-          const providedTotal = num(r['Total Cost']);
-          const computedTotal = qty * rate;
-          const total = providedTotal || computedTotal;
+          const provided = num(r['Total Cost']);
+          const total = provided || (qty*rate);
+          return `<tr>
+            <td>${esc(r['Cost Item'])}</td>
+            <td class="mono">${r['Quantity/Hours']? esc(r['Quantity/Hours']):'<span class="muted">—</span>'}</td>
+            <td class="mono">${r['Rate/Price']? currency(rate):'<span class="muted">—</span>'}</td>
+            <td class="mono">${currency(total)}</td>
+            <td>${r['Notes']? esc(r['Notes']):'<span class="muted">—</span>'}</td>
+            <td><span class="chip">${esc(r['Category']||'')}</span></td>
+          </tr>`;
+        }).join('');
 
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td data-label="Cost Item">${escapeHtml(r['Cost Item'])}</td>
-            <td class="mono" data-label="Quantity/Hours">${r['Quantity/Hours'] ? escapeHtml(r['Quantity/Hours']) : '<span class="muted">—</span>'}</td>
-            <td class="mono" data-label="Rate/Price">${r['Rate/Price'] ? currency.format(rate) : '<span class="muted">—</span>'}</td>
-            <td class="mono" data-label="Total Cost">${currency.format(total)}</td>
-            <td data-label="Notes">${r['Notes'] ? escapeHtml(r['Notes']) : '<span class="muted">—</span>'}</td>
-            <td data-label="Category"><span class="chip">${escapeHtml(r['Category'] || '')}</span></td>
-          `;
-          body.appendChild(tr);
-        });
-
-        // Recompute authoritative totals directly from data (ignore summary rows in TSV)
         const catSum = {};
         rows.forEach(r=>{
-          if (isSummaryRow(r['Cost Item'])) return;
+          if(isSummary(r['Cost Item'])) return;
           const qty = num(r['Quantity/Hours']);
           const rate = num(r['Rate/Price']);
-          const providedTotal = num(r['Total Cost']);
-          const total = providedTotal || (qty * rate);
-          const cat = r.Category || 'Uncategorized';
-          catSum[cat] = (catSum[cat] || 0) + total;
+          const provided = num(r['Total Cost']);
+          const total = provided || qty*rate;
+          catSum[r.Category||'Uncategorized'] = (catSum[r.Category||'Uncategorized']||0)+total;
         });
-
-        // Subtotal = sum of categories
         const subtotal = Object.values(catSum).reduce((a,b)=>a+b,0);
-        const contingency = subtotal * 0.20; // 20%
+        const contingency = subtotal * 0.20;
         const grand = subtotal + contingency;
-
-        elSubtotal.textContent = currency.format(subtotal);
-        elCont.textContent = currency.format(contingency);
-        elTotal.textContent = currency.format(grand);
-
-        count.textContent = `${filtered.length} items shown • ${categories.length} categories`;
+        elSub.textContent = currency(subtotal);
+        elCont.textContent = currency(contingency);
+        elTotal.textContent = currency(grand);
+        count.textContent = `${filtered.length} items shown • ${cats.length} categories`;
       }
-
-      function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
-
       catSel.addEventListener('change', compute);
       compute();
-    })();
+    }
+
+    // -------- Simple router --------
+    const routes = {
+      overview: (root)=> mountTemplate('t-overview', root),
+      vision: (root)=> mountTemplate('t-vision', root),
+      scope: (root)=> mountTemplate('t-scope', root),
+      stakeholders: (root)=> mountTemplate('t-stakeholders', root),
+      methodology: (root)=> mountTemplate('t-methodology', root),
+      dod: (root)=> { mountTemplate('t-dod', root); initDod(root); },
+      wbs: (root)=> { mountTemplate('t-wbs', root); initWbs(root); },
+      budget: (root)=> { mountTemplate('t-budget', root); initBudget(root); },
+      tools: (root)=> mountTemplate('t-tools', root),
+    };
+
+    function esc(s){ return String(s).replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m])); }
+
+    function setActiveTab(route){
+      $$('#nav .tab').forEach(a=>{
+        const hash = a.getAttribute('href').replace('#','') || 'overview';
+        a.setAttribute('aria-current', hash===route ? 'page' : 'false');
+      });
+    }
+
+    function render(){
+      const content = $('.content');
+      const hash = (location.hash || '#overview').slice(1);
+      const route = routes[hash] ? hash : 'overview';
+      // Title bar
+      content.innerHTML = `<div class="page-title"><h1>${routeLabel(route)}</h1><span class="subtitle">Help Desk Ticket Analytics System</span></div>`;
+      // Page body
+      const page = document.createElement('div');
+      content.appendChild(page);
+      routes[route](page);
+      setActiveTab(route);
+    }
+
+    function routeLabel(r){
+      switch(r){
+        case 'overview': return 'Overview';
+        case 'vision': return 'Vision & Strategy';
+        case 'scope': return 'Scope';
+        case 'stakeholders': return 'Stakeholders';
+        case 'methodology': return 'Methodology';
+        case 'dod': return 'Deliverables & DoD';
+        case 'wbs': return 'Work Breakdown Structure';
+        case 'budget': return 'Budget Estimations';
+        case 'tools': return 'Project Tools';
+        default: return 'Page';
+      }
+    }
+
+    window.addEventListener('hashchange', render);
+    window.addEventListener('DOMContentLoaded', render);
   </script>
-</section>
-
-
-</section>
-
-  <!-- 8–12 Placeholders -->
-  <section>
-    <h3>8. Budget Estimations</h3>
-    <p><em>Content coming soon.</em></p>
-
-    <h3>9. High-Level Timeline &amp; Milestones</h3>
-    <p><em>Content coming soon.</em></p>
-
-    <h3>10. Execution Plan Overview</h3>
-    <p><em>Content coming soon.</em></p>
-
-    <h3>11. Risk Register</h3>
-    <p><em>Content coming soon.</em></p>
-
-    <h3>12. Project Manager Authority &amp; Approvals</h3>
-    <p><em>Content coming soon.</em></p>
-  </section>
-
 </body>
 </html>
