@@ -1,9 +1,12 @@
 # ProjectCharter_HelpDeskTicketAnalysisSystem
 ## https://gmunoz58.github.io/ProjectCharter_HelpDeskTicketAnalysisSystem/
 
+<br>
 
 ## Update the Final Presentation to reflect the professor's comment: 
 "Your Final Delivery should be to present/implement at your job... not the class presentation."
+
+<br><br><br>
 
 ### Deliverable name: 
 Final Implementation Presentation
@@ -13,6 +16,8 @@ Tangible
 Deliver a practical implementation presentation at the PCC Help Desk by week 14 to showcase the analytics system and improvement plan.
 ### Definition of Done: 
 Presentation is completed at workplace with visual, results, and documentation submitted.
+
+<br><br><br>
 
 ## Update workpackages and tasks for final deliverable
 | Task Name |	Description |	Owner |	Duration (Days) |	Dependencies |
@@ -70,7 +75,7 @@ Presentation is completed at workplace with visual, results, and documentation s
   1	
   Feedback collected
 
-
+<br><br>
 
 ## Generate IT Help Desk Tickets
 ### Columns needed: Ticket num., 
